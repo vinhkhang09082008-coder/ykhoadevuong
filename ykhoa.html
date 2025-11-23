@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tra cứu bệnh - Y Khoa Đế Vương</title>
+  <style>
+    :root{--accent:#0b6efd;--muted:#6b7280;--card:#ffffff;--bg:#f3f8ff}
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;margin:0;background:var(--bg);color:#07243b}
+    header{background:linear-gradient(90deg,var(--accent),#6ea8fe);color:#fff;padding:22px 24px}
+    .container{max-width:1100px;margin:18px auto;padding:0 16px}
+    h1{margin:0;font-size:20px}
+    .topbar{display:flex;gap:12px;align-items:center}
+    .searchBox{margin-top:14px;display:flex;gap:8px}
+    input[type=text],select{flex:1;padding:10px 12px;border-radius:10px;border:1px solid rgba(2,6,23,0.06);background:white}
+    button{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
+
+    /* layout */
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:18px;margin-top:18px}
+    .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 20px rgba(11,110,253,0.06)}
+
+    /* left column */
+    .categories{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .cat{padding:8px 10px;border-radius:999px;background:#eef6ff;color:var(--accent);cursor:pointer;border:1px solid rgba(11,110,253,0.06)}
+    .cat.active{background:var(--accent);color:#fff}
+    .list{max-height:62vh;overflow:auto;padding-right:6px}
+    .item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent}
+    .item:hover{border-color:rgba(11,110,253,0.1);background:linear-gradient(180deg,rgba(11,110,253,0.03),transparent)}
+    .thumb{width:56px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0}
+    .meta{color:var(--muted);font-size:13px}
+
+    /* right column */
+    .detail h2{margin:0 0 6px 0}
+    .section{margin-top:12px}
+    .symptom{display:inline-block;padding:6px 8px;border-radius:8px;border:1px dashed #ddd;margin:4px;font-size:13px}
+    .grid-2{display:grid;grid-template-columns:1fr 320px;gap:14px}
+    .videoWrap video{width:100%;border-radius:10px}
+
+    footer{margin:30px 0;text-align:center;color:var(--muted)}
+
+    @media (max-width:1000px){.grid{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <div>
+        <h1>Y KHOA ĐẾ VƯƠNG-WEDSITE TRA CỨU BỆNH & TRIỆU CHỨNG</h1>
+        <div class="meta">Sức khỏe là vàng- Mọi thông tin đều lấy từ nguồn công khai</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="searchBox">
+      <input id="q" type="text" placeholder="Tìm theo tên bệnh hoặc triệu chứng (ví dụ: sốt, ho)" />
+      <select id="filterCategory" style="width:200px">
+        <option value="all">Tất cả chuyên khoa</option>
+      </select>
+      <button id="btnSearch">Tìm</button>
+    </div>
+
+    <div class="grid">
+      <aside class="card">
+        <strong>Danh mục bệnh</strong>
+        <div class="categories" id="cats"></div>
+
+        <div style="margin-top:8px">
+          <input id="symptomFilter" type="text" placeholder="Lọc theo triệu chứng (ví dụ: ho)" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee"/>
+        </div>
+
+        <div class="list" id="results"></div>
+      </aside>
+
+      <section class="card detail" id="detail">
+        <div class="grid-2">
+          <div>
+            <h2>Chọn bệnh để xem chi tiết</h2>
+            <div class="meta">Thông tin mô tả, triệu chứng, cách phòng ngừa, ảnh minh họa và video.</div>
+
+            <div class="section" id="detailContent">
+              <p>Danh sách bệnh đã được thêm sẵn. Dùng ô tìm kiếm để lọc nhanh.</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="padding:10px;margin-bottom:12px">
+              <strong>Thông tin nhanh</strong>
+              <div id="quickInfo" class="meta" style="margin-top:8px">Chọn một bệnh để xem thông tin</div>
+            </div>
+
+            <div class="card" style="padding:10px">
+              <strong>Hỗ trợ</strong>
+              <div class="meta" style="margin-top:8px">Y KHOA ĐẾ VƯƠNG- CHỈ HỖ TRỢ NGƯỜI BỆNH CHUẨN ĐOÁN BỆNH MUỐN BIẾT BỊ BỆNH GÌ MỘT CÁCH CHÍNH XÁC HÃY ĐẾN CƠ SỞ Y TẾ  <code></code></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <small>WEDSITE ĐƯỢC THÀNH LẬP BỞI ĐỘI NGŨ 2 THÀNH VIÊN: KHANG ĐÀO & CHAT GPT</small>
+      <img src="https://tomtattruyen.com/wp-content/uploads/vuong-lam.jpg" 
+     alt="Vuong Lam" 
+     style="max-width:60%; height:auto;">
+
+    </footer>
+  </main>
+
+  <script>
+    // Dữ liệu bệnh (mở rộng 20+ mục), mỗi mục có: id, name, group, description, symptoms[], prevention[], img, video
+    const DISEASES = [
+      {id:1, name:'Cảm cúm (Influenza)', group:'Bệnh hô hấp', description:'Nhiễm virus đường hô hấp gây sốt, đau mỏi cơ, ho, chảy mũi.', symptoms:['sốt','ho','đau họng','mệt mỏi'], prevention:['Tiêm vaccine hàng năm','Rửa tay thường xuyên','Nghỉ ngơi nhiều'], img:'https://bloganchoi.com/wp-content/uploads/2017/12/dau-hieu-cam-cum.jpg',video:'https://www.youtube.com/embed/en6tG5xkHe4?si=Ro9fhZ1jf-9xm4jC'},
+      {id:2, name:'Viêm phổi (Pneumonia)', group:'Bệnh hô hấp', description:'Viêm tổ chức phổi có thể do vi khuẩn hoặc virus, gây ho, sốt và khó thở.', symptoms:['sốt cao','ho','khó thở','đau ngực'], prevention:['Tiêm chủng pneumococcal','không hút thuốc','khử khuẩn tay'], img:'https://omron-yte.com.vn/wp-content/uploads/2021/10/hinh-anh-viem-phoi.jpg', video:'https://www.youtube.com/embed/_za9K_2e9es?si=fONW_1uZ_c3S1UGU'},
+      {id:3, name:'Viêm xoang (Sinusitis)', group:'Bệnh hô hấp', description:'Viêm các xoang quanh mũi, gây nghẹt mũi, đau mặt.', symptoms:['nghẹt mũi','đau mặt','chảy mũi'], prevention:['Rửa mũi nước muối','tránh dị ứng'], img:'https://vinmec-prod.s3.amazonaws.com/images/20191212_030549_415397_viem-xoang.max-800x800.jpg', video:'https://www.youtube.com/embed/ktLWj2XiLJQ?si=zXRwVW_zxGAMpGl-'},
+      {id:4, name:'Hen suyễn (Asthma)', group:'Bệnh hô hấp', description:'Bệnh mạn tính đường thở gây khò khè, khó thở.', symptoms:['khò khè','khó thở','ho về đêm'], prevention:['tránh dị nguyên','dùng thuốc kiểm soát theo hướng dẫn'], img:'https://hongngochospital.vn/wp-content/uploads/2023/05/hen-suyen.jpg', video:'https://www.youtube.com/embed/IvGMxUTTq2M?si=MhDKc-IwBEvN07RA'},
+
+      {id:5, name:'COVID-19', group:'Bệnh truyền nhiễm', description:'Bệnh do virus SARS-CoV-2, biểu hiện đa dạng từ nhẹ đến nặng.', symptoms:['sốt','ho','mất vị giác','mệt mỏi'], prevention:['Tiêm vaccine','khẩu trang','rửa tay'], img:'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2022/9/6/virus-covid-19-16624508278602855536.jpeg', video:'https://www.youtube.com/embed/45VVRS_cSgc?si=cYJMe9rK94cXRbhU'},
+      {id:6, name:'Sốt xuất huyết', group:'Bệnh truyền nhiễm', description:'Do virus Dengue, truyền bởi muỗi vằn, có thể gây sốt cao và chảy máu.', symptoms:['sốt cao','đau cơ','chảy máu cam','nổi ban'], prevention:['Ngăn muỗi sinh sản','màn chống muỗi','phun thuốc diệt muỗi'], img:'https://vienhuyethoc.vn/wp-content/uploads/2020/11/S%E1%BB%91t-xu%E1%BA%A5t-huy%E1%BA%BFt-2020.jpg', video:'https://www.youtube.com/embed/AkJBQoAbNho?si=b8ZKLZaJNHbFCxAC'},
+      {id:7, name:'Tay chân miệng', group:'Bệnh truyền nhiễm', description:'Thường gặp ở trẻ em, do virus gây loét miệng và bóng nước.', symptoms:['sốt','loét miệng','bóng nước tay chân'], prevention:['rửa tay','tránh tiếp xúc gần trẻ bệnh'], img:'https://th.bing.com/th/id/OIP.--D3PUYrkddOXl91cP_9SAHaGW?w=182&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/aU-nA_rn5N8?si=LNMPI39FMjOkFkUp'},
+      {id:8, name:'Thủy đậu (Chickenpox)', group:'Bệnh truyền nhiễm', description:'Nổi mụn nước ngứa toàn thân, lây qua tiếp xúc trực tiếp.', symptoms:['sốt','mụn nước ngứa'], prevention:['Tiêm vaccine','cách ly người bệnh'], img:'https://th.bing.com/th/id/OIP.HwMLvusnEJuU6-LFpHEwcAHaEK?w=284&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/xi9_P-oVXEE?si=oCwx9LfL8Y3vFO8q'},
+
+      {id:9, name:'Viêm dạ dày (Gastritis)', group:'Bệnh tiêu hóa', description:'Viêm niêm mạc dạ dày, gây đau vùng thượng vị, buồn nôn.', symptoms:['đau thượng vị','ợ nóng','buồn nôn'], prevention:['ăn uống điều độ','tránh NSAIDs kéo dài'], img:'https://th.bing.com/th/id/OIP.54sCgifg4HnZsckiG4LR1QHaEe?w=283&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/tFx0gyEKQ3c?si=s5GV3SSqhrMQmqTj'},
+      {id:10, name:'Tiêu chảy cấp', group:'Bệnh tiêu hóa', description:'Phân lỏng nhiều lần do nhiễm khuẩn/virus/độc tố.', symptoms:['tiêu chảy','buồn nôn','đau bụng'], prevention:['uống nước sạch','rửa tay','bù nước điện giải'], img:'https://th.bing.com/th/id/OIP.4Gv416xnvtWORUUZxit0xwHaE7?w=245&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/U5M91lsUl_k?si=JcKbUTn1eBN8XouH'},
+      {id:11, name:'Ngộ độc thực phẩm', group:'Bệnh tiêu hóa', description:'Do ăn phải thực phẩm nhiễm khuẩn hoặc độc chất.', symptoms:['nôn','tiêu chảy','đau bụng'], prevention:['ăn chín uống sôi','bảo quản thực phẩm đúng cách'], img:'https://th.bing.com/th/id/OIP.h6-xP6ZYxgJRDMAkz7eZ3gHaE8?w=286&h=191&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/5QIto28bjrA?si=zN2ruB6DX_wHGu30'},
+
+      {id:12, name:'Viêm da cơ địa (Eczema)', group:'Bệnh da liễu', description:'Da khô, ngứa, dễ viêm khi tiếp xúc dị nguyên.', symptoms:['ngứa','da đỏ','tróc vảy'], prevention:['dưỡng ẩm','tránh dị nguyên'], img:'https://th.bing.com/th/id/OIP.QKNJHLiW-dcYnHojQOBMxwHaFj?w=205&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/_YE3sNj7zq8?si=tmCpqIKTUHyWlJp3'},
+      {id:13, name:'Nấm da (Tinea)', group:'Bệnh da liễu', description:'Nhiễm nấm gây mảng đỏ, ngứa trên da.', symptoms:['ngứa','mảng đỏ'], prevention:['giữ da khô','không dùng chung đồ cá nhân'], img:'https://th.bing.com/th/id/OIP.hRte3D3xo6PIJdzHz6ouKQHaE8?w=265&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/VxCGG4hxJVQ?si=LKfAEh0Hz0ZguRGy'},
+      {id:14, name:'Ghẻ (Scabies)', group:'Bệnh da liễu', description:'Do ký sinh trùng Sarcoptes scabiei, gây ngứa dữ dội.', symptoms:['ngứa nhiều về đêm','nốt mẩn nhỏ'], prevention:['điều trị toàn thân','giặt đồ trải giường nóng'], img:'https://th.bing.com/th/id/OIP.t1Z9CrFKak8i63KQ9ylCwAHaEn?w=301&h=187&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/MTMrwgBm3gw?si=I-5yYoh2uf8aZkR_'},
+
+      {id:15, name:'Huyết áp cao (Hypertension)', group:'Bệnh tim mạch', description:'Tăng áp lực động mạch mạn tính, nguy cơ tim mạch.', symptoms:['đau đầu','choáng váng','thường không triệu chứng rõ'], prevention:['giảm muối','tập thể dục','kiểm tra định kỳ'], img:'https://th.bing.com/th/id/OIP.reL75soLA45P7d6xTvBIwwHaF2?w=190&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/vcjEQE8w_qk?si=2V7RjXgNN0wi_CqP'},
+      {id:16, name:'Đột quỵ (Stroke)', group:'Bệnh tim mạch', description:'Rối loạn cấp tuần hoàn não gây mất chức năng thần kinh.', symptoms:['liệt nửa người','méo miệng','nói khó'], prevention:['kiểm soát huyết áp','kiểm soát đái tháo đường'], img:'https://th.bing.com/th/id/OIP.JByeqzlHH_pPfBGwe1FgxwHaEK?w=275&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/93Q4JZNr_To?si=6mNtEFWchMUQsQgc'},
+      {id:17, name:'Thiếu máu cơ tim (Angina/MI)', group:'Bệnh tim mạch', description:'Thiếu oxy cơ tim do thiếu máu nuôi, có thể gây đau ngực.', symptoms:['đau ngực','đau lan vai/trái'], prevention:['kiểm soát lipid','bỏ thuốc lá'], img:'https://th.bing.com/th/id/OIP.a8_bisoxo_84PzOBZKZOZwHaFj?w=224&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/_VGZQEtY5hU?si=Fh0XWHdFzBaOgjNc'},
+
+      {id:18, name:'Quai bị (Mumps)', group:'Bệnh truyền nhiễm', description:'Sưng tuyến mang tai, đau khi ăn, do virus.', symptoms:['sưng má','sốt','đau khi nhai'], prevention:['tiêm vaccine MMR'], img:'https://th.bing.com/th/id/OIP.VCJcuTn9Pj18jYA-Kw4VPAHaFj?w=217&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/i5oqiQwdMjM?si=EMx4jux8cO0UFyBH'},
+      {id:19, name:'Viêm họng do liên cầu', group:'Bệnh hô hấp', description:'Nhiễm khuẩn gây đau họng dữ dội, cần kháng sinh khi xác định.', symptoms:['đau họng','sốt','sưng hạch cổ'], prevention:['rửa tay','khám khi triệu chứng nặng'], img:'https://th.bing.com/th/id/OIP.bJPEY5kBvbW1euazvNm12wHaEo?w=274&h=180&c=7&r=0&o=7&pid=1.7&rm=3', video:'https://www.youtube.com/embed/wpmRzr1Cnsk?si=x_qABCbDVJiYxVJy'},
+      {id:20, name:'Dị ứng (Allergy)', group:'Khác', description:'Phản ứng miễn dịch với dị nguyên: mẩn, ngứa, sổ mũi.', symptoms:['hắt hơi','ngứa','mẩn đỏ'], prevention:['tránh dị nguyên','thuốc kháng histamine'], img:'https://cdn.nhathuoclongchau.com.vn/unsafe/800x0/filters:quality(95)/https://cms-prod.s3-sgn09.fptcloud.com/trieu_chung_di_ung_di_ung_thuoc_phat_ban_1_16feb0312c.jpg', video:'https://www.youtube.com/embed/JoYnmoJ1iJg?si=mqHScHW6Un9k7nQr'}
+    ];
+
+    // populate category list
+    const groups = Array.from(new Set(DISEASES.map(d=>d.group)));
+    const filterCategory = document.getElementById('filterCategory');
+    const catsWrap = document.getElementById('cats');
+    groups.forEach(g=>{
+      const opt = document.createElement('option'); opt.value = g; opt.textContent = g; filterCategory.appendChild(opt);
+      const b = document.createElement('div'); b.className='cat'; b.textContent = g; b.dataset.group = g; b.addEventListener('click', ()=>{ selectCategory(g); }); catsWrap.appendChild(b);
+    });
+
+    // DOM
+    const qEl = document.getElementById('q');
+    const btn = document.getElementById('btnSearch');
+    const resultsEl = document.getElementById('results');
+    const detailContent = document.getElementById('detailContent');
+    const statsEl = document.getElementById('quickInfo');
+    const symptomFilter = document.getElementById('symptomFilter');
+
+    function renderList(list){
+      resultsEl.innerHTML = '';
+      if(list.length===0){ resultsEl.innerHTML = '<div class="meta">Không có kết quả</div>'; return }
+      list.forEach(d=>{
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `<img class="thumb" src="${d.img}" alt=""><div style="flex:1"><strong>${d.name}</strong><div class="meta">${d.group} • Triệu chứng: ${d.symptoms.slice(0,3).join(', ')}</div></div>`;
+        it.addEventListener('click', ()=> showDetail(d));
+        resultsEl.appendChild(it);
+      })
+    }
+
+    function showDetail(d){
+      detailContent.innerHTML = `
+        <div><strong style="font-size:18px">${d.name}</strong></div>
+        <div class="meta">Nhóm: ${d.group}</div>
+        <div class="section"><strong>Mô tả:</strong><div>${escapeHtml(d.description)}</div></div>
+        <div class="section"><strong>Triệu chứng:</strong><div>${d.symptoms.map(s=>`<span class=\"symptom\">${s}</span>`).join('')}</div></div>
+        <div class="section"><strong>Cách phòng ngừa:</strong><ul>${d.prevention.map(p=>`<li>${escapeHtml(p)}</li>`).join('')}</ul></div>
+        <div class="section"><strong>Hình minh họa:</strong><img src="${d.img}" style="width:100%;border-radius:10px;margin-top:8px" alt="Ảnh minh họa"></div>
+       <div class="section videoWrap"><strong>Video phòng ngừa:</strong><br>
+<iframe src="${d.video}" frameborder="0" allowfullscreen style="width:100%;height:250px;border-radius:10px"></iframe>
+</div>
+      `;
+      statsEl.textContent = `${d.name} — Nhóm: ${d.group} — Triệu chứng chính: ${d.symptoms.slice(0,3).join(', ')}`;
+      // highlight active category
+      document.querySelectorAll('.cat').forEach(c=> c.classList.toggle('active', c.dataset.group === d.group));
+    }
+
+    function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+    function search(){
+      const q = qEl.value.trim().toLowerCase();
+      const cat = filterCategory.value;
+      const symptomQ = symptomFilter.value.trim().toLowerCase();
+      let list = DISEASES.filter(d=>{
+        if(cat!=='all' && d.group !== cat) return false;
+        if(q){
+          const inName = d.name.toLowerCase().includes(q) || (d.description||'').toLowerCase().includes(q);
+          const inSym = d.symptoms.some(s=>s.toLowerCase().includes(q));
+          if(!(inName||inSym)) return false;
+        }
+        if(symptomQ){
+          const has = d.symptoms.some(s=>s.toLowerCase().includes(symptomQ));
+          if(!has) return false;
+        }
+        return true;
+      });
+      renderList(list);
+      if(list.length>0) showDetail(list[0]);
+    }
+
+    function selectCategory(g){
+      filterCategory.value = g; document.querySelectorAll('.cat').forEach(c=> c.classList.toggle('active', c.dataset.group===g)); search();
+    }
+
+    // initial render
+    renderList(DISEASES); showDetail(DISEASES[0]);
+
+    // events
+    btn.addEventListener('click', search);
+    qEl.addEventListener('input', search); // real-time
+    qEl.addEventListener('keydown', e=>{ if(e.key==='Enter') search() });
+    filterCategory.addEventListener('change', search);
+    symptomFilter.addEventListener('input', search);
+
+    // helper to add diseases dynamically
+    window.addDisease = function(obj){ obj.id = DISEASES.length ? Math.max(...DISEASES.map(x=>x.id))+1 : 1; DISEASES.push(obj); renderList(DISEASES); }
+  </script>
+</body>
+</html>
